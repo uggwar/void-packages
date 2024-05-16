@@ -1,0 +1,44 @@
+# Template file for 'rocm-llvm'
+pkgname=rocm-llvm
+version=6.1.1
+revision=1
+build_wrksrc=llvm
+build_style=cmake
+configure_args="
+ -DCMAKE_BUILD_TYPE=Release -Wno-dev
+ -DCMAKE_INSTALL_PREFIX='/opt/rocm/lib/llvm'
+ -DLLVM_HOST_TRIPLE=x86_64-unknown-linux-gnu
+ -DLLVM_ENABLE_PROJECTS='llvm;clang;lld;compiler-rt;clang-tools-extra'
+ -DCLANG_ENABLE_AMDCLANG=ON
+ -DLLVM_ENABLE_RUNTIMES='libcxx;libcxxabi;libunwind'
+ -DLIBCXX_ENABLE_STATIC=ON
+ -DLIBCXXABI_ENABLE_STATIC=ON
+ -DLLVM_TARGETS_TO_BUILD='AMDGPU;NVPTX;X86'
+ -DCLANG_DEFAULT_LINKER=lld
+ -DLLVM_INSTALL_UTILS=ON
+ -DLLVM_ENABLE_BINDINGS=OFF
+ -DLLVM_LINK_LLVM_DYLIB=OFF
+ -DLLVM_BUILD_LLVM_DYLIB=OFF
+ -DLLVM_ENABLE_ASSERTIONS=ON
+ -DOCAMLFIND=NO
+ -DLLVM_ENABLE_OCAMLDOC=OFF
+ -DLLVM_INCLUDE_BENCHMARKS=OFF
+ -DLLVM_BUILD_TESTS=OFF
+ -DLLVM_INCLUDE_TESTS=OFF
+ -DCLANG_INCLUDE_TESTS=OFF
+ -DLLVM_BINUTILS_INCDIR=/usr/include
+"
+hostmakedepends="perl python3 zlib-devel libffi-devel swig python3-Sphinx cmake ninja
+ python3-recommonmark python3-sphinx-automodapi git python3-sphinx-markdown-tables python3-yaml pkg-config "
+makedepends="python3-devel zlib-devel elfutils-devel libffi-devel libedit-devel
+ libxml2-devel binutils-devel "
+lib32disabled=yes
+python_version=3
+
+short_desc="AMD Fork of The LLVM Compiler Infrastructure"
+maintainer="Christer Stenbrenden <christer@uggwar.net>"
+license="Apache-2.0"
+homepage="https://github.com/ROCm/llvm-project"
+#changelog=""
+distfiles="https://github.com/ROCm/llvm-project/archive/rocm-${version}.tar.gz"
+checksum=f1a67efb49f76a9b262e9735d3f75ad21e3bd6a05338c9b15c01e6c625c4460d
