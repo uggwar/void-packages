@@ -1,0 +1,31 @@
+# Template file for 'rocm-common'
+pkgname=rocm-common
+version=6.0.2
+revision=1
+build_style=meta
+short_desc="AMD ROCm core package (version files)"
+maintainer="Christer Stenbrenden <christer@uggwar.net>"
+license="Unlicense"
+homepage="https://rocm.docs.amd.com/"
+
+_rocm_major=6
+_rocm_minor=0
+_rocm_patch=2
+_pkgver_magic=115
+
+do_install() {
+	vinstall ${FILESDIR}/rocm-ld.conf 644 etc/ld.so.conf.d
+	vinstall ${FILESDIR}/rocm-profile.sh 644 etc/profile.d
+	echo "$pkgver-$_pkgver_magic" > version
+	echo "$pkgver-$_pkgver_magic" > version-dev
+	vinstall version 644 opt/rocm/.info
+	vinstall version-dev 644 opt/rocm/.info
+	echo "#pragma once" > rocm_version.h
+	echo "#define ROCM_VERSION_MAJOR ${_rocm_major}" >> rocm_version.h
+	echo "#define ROCM_VERSION_MINOR ${_rocm_minor}" >> rocm_version.h
+	echo "#define ROCM_VERSION_PATCH ${_rocm_patch}" >> rocm_version.h
+	echo "#define ROCM_BUILD_INFO \"${_rocm_major}.${_rocm_minor}.${_rocm_patch}.0-${_pkgver_magic}\"" >> rocm_version.h
+	vinstall rocm_version.h 644 opt/rocm/include
+	vinstall rocm_version.h 644 opt/rocm/include/rocm_core
+	vinstall ${FILESDIR}/LICENSE 644 usr/share/licenses/${pkgname}
+}
