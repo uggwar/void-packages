@@ -1,6 +1,6 @@
 # Template file for 'nodejs'
 pkgname=nodejs
-version=18.19.1
+version=20.13.1
 revision=1
 hostmakedepends="which pkg-config python3-setuptools"
 _make_depends="zlib-devel $(vopt_if icu icu-devel)
@@ -15,7 +15,7 @@ license="MIT"
 homepage="https://nodejs.org/"
 changelog="https://raw.githubusercontent.com/nodejs/node/main/doc/changelogs/CHANGELOG_V${version%%.*}.md"
 distfiles="https://nodejs.org/dist/v${version}/node-v${version}.tar.xz"
-checksum=090f96a2ecde080b6b382c6d642bca5d0be4702a78cb555be7bf02b20bd16ded
+checksum=791786a09023241cb7e4f7d65ec90aa924bb39141ff7bb6d5a1dedf7def4b4e7
 python_version=3
 
 build_options="ssl libuv icu nghttp2 cares brotli"
