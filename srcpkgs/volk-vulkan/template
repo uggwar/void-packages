@@ -1,0 +1,21 @@
+# Template file for 'volk-vulkan'
+pkgname=volk-vulkan
+version=1.3.283.0
+revision=1
+build_style=cmake
+configure_args="
+ -DCMAKE_BUILD_TYPE=Release
+ -DCMAKE_C_FLAGS_RELEASE="-DNDEBUG"
+ -DCMAKE_INSTALL_PREFIX=/usr
+ -DVOLK_INSTALL=ON
+ -Wno-dev
+"
+hostmakedepends="cmake git"
+makedepends="Vulkan-Headers vulkan-loader"
+depends="Vulkan-Headers vulkan-loader"
+short_desc="Meta loader for Vulkan API"
+maintainer="Christer Stenbrenden <christer@uggwar.net>"
+license="MIT"
+homepage="https://github.com/zeux/volk"
+distfiles="https://github.com/zeux/volk/archive/refs/tags/vulkan-sdk-${version}.zip"
+checksum=c4358d9bb9eceb34551a597d6d539858f4b0bc2fefe8e3cfdfd32c7da3e9aee9
