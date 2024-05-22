@@ -1,0 +1,24 @@
+# Template file for 'comgr'
+pkgname=comgr
+version=6.1.1
+revision=1
+build_wrksrc="amd/comgr"
+build_style=cmake
+configure_args="
+ -Wno-dev
+ -D CMAKE_INSTALL_PREFIX=/opt/rocm
+ -D CMAKE_BUILD_TYPE=None
+ -D CMAKE_BUILD_WITH_INSTALL_RPATH=OFF
+ -D BUILD_TESTING=ON
+ -D ROCM_DIR=/opt/rocm
+ -D CMAKE_PREFIX_PATH=/opt/rocm/lib/llvm
+"
+hostmakedepends=""
+makedepends="libzstd-devel libedit-devel zlib-devel libxml2-devel ncurses-libtinfo-devel rocm-llvm rocm-common rocm-device-libs"
+depends="zstd zlib libedit ncurses libxml2 rocm-common rocm-device-libs"
+short_desc="Compiler support library for ROCm LLVM"
+maintainer="Christer Stenbrenden <christer@uggwar.net>"
+license="NCSA"
+homepage="https://github.com/ROCm/ROCm-CompilerSupport"
+distfiles="https://github.com/ROCm/llvm-project/archive/refs/tags/rocm-${version}.tar.gz"
+checksum=f1a67efb49f76a9b262e9735d3f75ad21e3bd6a05338c9b15c01e6c625c4460d
