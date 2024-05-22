@@ -1,0 +1,21 @@
+# Template file for 'hsakmt-roct'
+pkgname=hsakmt-roct
+version=6.1.1
+revision=1
+#archs="i686 x86_64"
+#build_wrksrc=
+build_style=cmake
+configure_args="
+ -Wno-dev
+ -D CMAKE_BUILD_TYPE=None
+ -D BUILD_SHARED_LIBS=ON
+ -D CMAKE_INSTALL_PREFIX=/opt/rocm
+"
+makedepends="cmake pkg-config libdrm-devel libnuma-devel"
+depends="rocm-common numactl pciutils libdrm"
+short_desc="Radeon Open Compute Thunk Interface"
+maintainer="Christer Stenbrenden <christer@uggwar.net>"
+license="MIT"
+homepage="https://rocmdocs.amd.com/en/latest/Installation_Guide/ROCt.html"
+distfiles="https://github.com/ROCm/ROCT-Thunk-Interface/archive/refs/tags/rocm-${version}.tar.gz"
+checksum=c586d8a04fbd9a7bc0a15e0a6a161a07f88f654402bb11694bd8aebc343c00f0
