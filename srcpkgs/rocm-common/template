@@ -1,6 +1,6 @@
 # Template file for 'rocm-common'
 pkgname=rocm-common
-version=6.0.2
+version=6.1.1
 revision=1
 build_style=meta
 short_desc="AMD ROCm core package (version files)"
