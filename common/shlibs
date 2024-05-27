@@ -720,6 +720,7 @@ libprrte.so.3 libopenmpi-5.0.1_1
 libmtp.so.9 libmtp-1.1.4_1
 libhsakmt.so.1 hsakmt-roct-6.1.1_1
 libhsa-runtime64.so.1 hsa-rocr-6.1.1_1
+libamd_comgr.so.2 comgr-6.1.1_1
 libelf.so.1 libelf-0.155_1
 libdw.so.1 libelf-0.155_1
 libasm.so.1 libelf-0.155_1
