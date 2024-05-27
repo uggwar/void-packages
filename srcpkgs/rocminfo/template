@@ -1,0 +1,28 @@
+# Template file for 'rocminfo'
+pkgname=rocminfo
+version=6.1.1
+revision=1
+#archs="i686 x86_64"
+#build_wrksrc=
+build_style=cmake
+configure_args="
+ -Wno-dev
+ -D CMAKE_PREFIX_PATH=/opt/rocm
+ -D ROCRTST_BLD_TYPE=Release
+ -D CMAKE_INSTALL_PREFIX=/opt/rocm
+ -D CMAKE_INSTALL_LIBDIR=lib
+ -D hsa-runtime64_DIR=/opt/rocm/lib/cmake/hsa-runtime64
+"
+#make_build_args=""
+#make_install_args=""
+#conf_files=""
+#make_dirs="/var/log/dir 0755 root root"
+hostmakedepends="cmake rocm-cmake pkg-config"
+makedepends="rocm-common pciutils python3 hsa-rocr hsakmt-roct"
+depends="rocm-common pciutils python3 hsa-rocr hsakmt-roct"
+short_desc="ROCm Application for Reporting System Info"
+maintainer="Christer Stenbrenden <christer@uggwar.net>"
+license="NCSA"
+homepage="https://github.com/ROCm/rocminfo"
+distfiles="${homepage}/archive/rocm-${version}.tar.gz"
+checksum=ef5e33ad3d0bae462d01e1528ffa9c83c587ccbf7ef5947e096e550480d83819
