@@ -718,6 +718,7 @@ libopen-pal.so.80 libopenmpi-5.0.1_1
 libpmix.so.2 libopenmpi-5.0.1_1
 libprrte.so.3 libopenmpi-5.0.1_1
 libmtp.so.9 libmtp-1.1.4_1
+libhsakmt.so.1 hsakmt-roct-6.1.1_1
 libelf.so.1 libelf-0.155_1
 libdw.so.1 libelf-0.155_1
 libasm.so.1 libelf-0.155_1
