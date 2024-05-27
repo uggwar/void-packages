@@ -36,6 +36,10 @@ depends="rocm-common"
 lib32disabled=yes
 python_version=3
 
+post_install() {
+	ln -s /opt/lib/llvm ${DESTDIR}/opt/rocm/llvm
+}
+
 short_desc="AMD Fork of The LLVM Compiler Infrastructure"
 maintainer="Christer Stenbrenden <christer@uggwar.net>"
 license="Apache-2.0"
