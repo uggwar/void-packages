@@ -401,7 +401,9 @@ libavdevice.so.61 libavdevice7-7.1.1_1
 libavdevice.so.60 libavdevice6-6.0_1
 libavformat.so.61 libavformat7-7.1.1_1
 libavformat.so.60 libavformat6-6.0_1
+libswscale.so.8 libswscale7-7.1.1_1
 libswscale.so.7 libswscale6-6.0_1
+libswresample.so.5 libswresample7-7.1.1_1
 libswresample.so.4 libswresample6-6.0_1
 libpostproc.so.57 libpostproc6-6.0_1
 libavcodec.so.61 libavcodec7-7.1.1_1
