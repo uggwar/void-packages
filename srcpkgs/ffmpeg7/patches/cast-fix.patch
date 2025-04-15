@@ -1,0 +1,12 @@
+diff -Naur ffmpeg7-7.1.1-orig/libavdevice/v4l2.c ffmpeg7-7.1.1/libavdevice/v4l2.c
+--- ffmpeg7-7.1.1-orig/libavdevice/v4l2.c	2025-04-15 10:59:20.186398059 +0000
++++ ffmpeg7-7.1.1/libavdevice/v4l2.c	2025-04-15 10:56:15.754388545 +0000
+@@ -138,7 +138,7 @@
+     s->open_f   = prefix ## open;       \
+     s->close_f  = prefix ## close;      \
+     s->dup_f    = prefix ## dup;        \
+-    s->ioctl_f  = prefix ## ioctl;      \
++    s->ioctl_f  = (int (*)(int, unsigned long int, ...)) prefix ## ioctl;      \
+     s->read_f   = prefix ## read;       \
+     s->mmap_f   = prefix ## mmap;       \
+     s->munmap_f = prefix ## munmap;     \
