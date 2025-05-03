@@ -1,0 +1,29 @@
+# Template file for 'rocm-core'
+pkgname=rocm-core
+version=6.4.0
+revision=1
+archs="x86_64"
+#build_wrksrc=
+build_style=cmake
+configure_args="-Wno-dev
+ -S $pkgname-rocm-$version
+ -D CMAKE_BUILD_TYPE=None
+ -D BUILD_SHARED_LIBS=ON
+ -D CMAKE_INSTALL_PREFIX=/opt/rocm
+ -D ROCM_VERSION="$version"
+"
+hostmakedepends="cmake ninja"
+makedepends=""
+depends="libgcc glibc"
+short_desc="AMD ROCm core package (version files)"
+maintainer="Christer Stenbrenden <christer@uggwar.net>"
+license="MIT"
+homepage="https://rocm.docs.amd.com/"
+#changelog=""
+distfiles="https://github.com/ROCm/rocm-core/archive/refs/tags/rocm-$version.tar.gz"
+checksum=058739404c91105c1b34117803f6b48917a23191291ce67020e6b983b45450c1
+
+post_install() {
+	vinstall "${FILESDIR}"/rocm-ld.conf 644 etc/ld.so.conf.d/ rocm.conf
+	vinstall "${FILESDIR}"/rocm-profile.sh 644 etc/profile.d/ rocm.sh
+}
