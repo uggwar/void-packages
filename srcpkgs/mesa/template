@@ -243,6 +243,18 @@ mesa-libgallium_package() {
 	}
 }
 
+libglapi_package() {
+	# this dependency is wrong, it was added as a hack to allow updating
+	# systems with libglapi-32bit after the switch to glvnd
+	# see 927f17347f9c646047c65312c8e8ce1ad88b7832
+	# it can be removed when glibc multilib (with *-32bit packages) is removed
+	depends="libglvnd"
+	short_desc="Free implementation of the GL API - shared library"
+	pkg_install() {
+		vmove "usr/lib/libglapi.so.*"
+	}
+}
+
 libgbm_package() {
 	short_desc="Mesa Generic buffer management API - runtime"
 	pkg_install() {
