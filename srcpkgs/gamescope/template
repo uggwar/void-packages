@@ -12,7 +12,7 @@ _libliftoff_hash=8b08dc1c14fd019cc90ddabe34ad16596b0691f4
 _wlroots_hash=4bc5333a2cbba0b0b88559f281dbde04b849e6ef
 build_style=meson
 configure_args="-Denable_openvr_support=false"
-hostmakedepends="glslang pkg-config wayland-devel hwids"
+hostmakedepends="git glslang pkg-config wayland-devel hwids"
 makedepends="pipewire-devel SPIRV-Headers libX11-devel
  libXdamage-devel libXcomposite-devel libXrender-devel libXxf86vm-devel
  libXtst-devel libXres-devel libXmu-devel libdrm-devel vulkan-loader-devel
