@@ -2,7 +2,7 @@
 # XXX: ensure all compiled rofi plugins work with each version
 # xlocate 'usr/lib/rofi/.*.so' to find them
 pkgname=rofi-wayland
-version=1.7.8
+version=1.7.9
 revision=1
 build_style=meson
 hostmakedepends="flex glib-devel pkg-config which"
@@ -14,8 +14,8 @@ maintainer="christer <christer@uggwar.net>"
 license="MIT"
 homepage="https://github.com/lbonn/rofi"
 changelog="https://github.com/lbonn/rofi/releases"
-distfiles="https://github.com/lbonn/rofi/releases/download/1.7.8%2Bwayland1/rofi-${version}+wayland1.tar.gz"
-checksum=45ec7c8e8484b2e18b9abeaf54fe1d64e7b7fe4fd1c589559a544dd3c81af7c8
+distfiles="https://github.com/lbonn/rofi/releases/download/$version+wayland1/rofi-$version+wayland1.tar.gz"
+checksum=688c5f477ad2ddb144b66786f9c188b6bf48f1e1bec38f7977aef94ed267d90f
 
 configure_args+=" -Dxcb=disabled"
 
