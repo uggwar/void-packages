@@ -17,6 +17,7 @@
  drivers/gpu/drm/amd/pm/amdgpu_pm.c              |    3 +
  drivers/gpu/drm/amd/pm/swsmu/amdgpu_smu.c       |   14 +-
  drivers/input/evdev.c                           |   19 +-
+ drivers/net/wireless/intel/iwlwifi/pcie/drv.c   |   26 +-
  drivers/pci/controller/Makefile                 |    6 +
  drivers/pci/controller/intel-nvme-remap.c       |  462 ++
  drivers/pci/quirks.c                            |  101 +
@@ -98,7 +99,7 @@
  net/ipv4/tcp_output.c                           |   48 +-
  net/ipv4/tcp_rate.c                             |   30 +-
  net/ipv4/tcp_timer.c                            |    1 +
- 100 files changed, 14308 insertions(+), 640 deletions(-)
+ 101 files changed, 14321 insertions(+), 653 deletions(-)
 
 diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
 index f6d317e1674d6a501b20c3b050d7976020dab4b9..5856aa83a2ad478e60966830f9a7b901e2d92ba9 100644
@@ -264,13 +265,13 @@ index 0000000000000000000000000000000000000000..05c84eec0f31aca973839b12a918903e
 +priority boost from unblocking while background threads that do most of the
 +processing receive the priority penalty for using their entire timeslice.
 diff --git a/Makefile b/Makefile
-index e5509045fe3f3a6912c8939ee54acb7601159ae1..d714c785b1e8076a96c4d27743bbc158a770a1f6 100644
+index 58a78d21557742a725bfe8d647b966f9c89e7922..a5d1ce8f3154f658249cbec321b358d0e620a3f7 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -2,8 +2,8 @@
  VERSION = 6
  PATCHLEVEL = 16
- SUBLEVEL = 4
+ SUBLEVEL = 5
 -EXTRAVERSION =
 -NAME = Baby Opossum Posse
 +EXTRAVERSION = -zen1
@@ -629,7 +630,7 @@ index 4db92e0a60da7b37ad0be30fbc4c6f0d30836153..a5db963da61032b52816ad8aca955208
   * DOC: vramlimit (int)
   * Restrict the total amount of VRAM in MiB for testing.  The default is 0 (Use full VRAM).
 diff --git a/drivers/gpu/drm/amd/pm/amdgpu_pm.c b/drivers/gpu/drm/amd/pm/amdgpu_pm.c
-index 39ee810850885ccd56ddf0f8e121ed18a6bb3b8a..a2df219060dce310270c94a6dff614113e0c8643 100644
+index f417c5eb0f41a9a5678b29ad9979b4d0a6f19e39..accf1f539f9ee65ea2f0ead69b5b39417485a24e 100644
 --- a/drivers/gpu/drm/amd/pm/amdgpu_pm.c
 +++ b/drivers/gpu/drm/amd/pm/amdgpu_pm.c
 @@ -3073,6 +3073,9 @@ static ssize_t amdgpu_hwmon_show_power_cap_min(struct device *dev,
@@ -758,6 +759,50 @@ index b5cbb57ee5f60073a41d16da23a8d3fa6c09f04a..a0f7fa1518c6607701912d9357be5086
  	return error;
  }
  
+diff --git a/drivers/net/wireless/intel/iwlwifi/pcie/drv.c b/drivers/net/wireless/intel/iwlwifi/pcie/drv.c
+index 0a9e0dbb58fbf7826bc2599afe8b9efa51c7ac51..0ee480480b2c33a4aeb595dc65c243b9be674b0d 100644
+--- a/drivers/net/wireless/intel/iwlwifi/pcie/drv.c
++++ b/drivers/net/wireless/intel/iwlwifi/pcie/drv.c
+@@ -124,13 +124,13 @@ VISIBLE_IF_IWLWIFI_KUNIT const struct pci_device_id iwl_hw_card_ids[] = {
+ 	{IWL_PCI_DEVICE(0x0082, 0x1304, iwl6005_mac_cfg)},/* low 5GHz active */
+ 	{IWL_PCI_DEVICE(0x0082, 0x1305, iwl6005_mac_cfg)},/* high 5GHz active */
+ 
+-/* 6x30 Series */
+-	{IWL_PCI_DEVICE(0x008A, 0x5305, iwl1000_mac_cfg)},
+-	{IWL_PCI_DEVICE(0x008A, 0x5307, iwl1000_mac_cfg)},
+-	{IWL_PCI_DEVICE(0x008A, 0x5325, iwl1000_mac_cfg)},
+-	{IWL_PCI_DEVICE(0x008A, 0x5327, iwl1000_mac_cfg)},
+-	{IWL_PCI_DEVICE(0x008B, 0x5315, iwl1000_mac_cfg)},
+-	{IWL_PCI_DEVICE(0x008B, 0x5317, iwl1000_mac_cfg)},
++/* 1030/6x30 Series */
++	{IWL_PCI_DEVICE(0x008A, 0x5305, iwl6030_mac_cfg)},
++	{IWL_PCI_DEVICE(0x008A, 0x5307, iwl6030_mac_cfg)},
++	{IWL_PCI_DEVICE(0x008A, 0x5325, iwl6030_mac_cfg)},
++	{IWL_PCI_DEVICE(0x008A, 0x5327, iwl6030_mac_cfg)},
++	{IWL_PCI_DEVICE(0x008B, 0x5315, iwl6030_mac_cfg)},
++	{IWL_PCI_DEVICE(0x008B, 0x5317, iwl6030_mac_cfg)},
+ 	{IWL_PCI_DEVICE(0x0090, 0x5211, iwl6030_mac_cfg)},
+ 	{IWL_PCI_DEVICE(0x0090, 0x5215, iwl6030_mac_cfg)},
+ 	{IWL_PCI_DEVICE(0x0090, 0x5216, iwl6030_mac_cfg)},
+@@ -181,12 +181,12 @@ VISIBLE_IF_IWLWIFI_KUNIT const struct pci_device_id iwl_hw_card_ids[] = {
+ 	{IWL_PCI_DEVICE(0x08AE, 0x1027, iwl1000_mac_cfg)},
+ 
+ /* 130 Series WiFi */
+-	{IWL_PCI_DEVICE(0x0896, 0x5005, iwl1000_mac_cfg)},
+-	{IWL_PCI_DEVICE(0x0896, 0x5007, iwl1000_mac_cfg)},
+-	{IWL_PCI_DEVICE(0x0897, 0x5015, iwl1000_mac_cfg)},
+-	{IWL_PCI_DEVICE(0x0897, 0x5017, iwl1000_mac_cfg)},
+-	{IWL_PCI_DEVICE(0x0896, 0x5025, iwl1000_mac_cfg)},
+-	{IWL_PCI_DEVICE(0x0896, 0x5027, iwl1000_mac_cfg)},
++	{IWL_PCI_DEVICE(0x0896, 0x5005, iwl6030_mac_cfg)},
++	{IWL_PCI_DEVICE(0x0896, 0x5007, iwl6030_mac_cfg)},
++	{IWL_PCI_DEVICE(0x0897, 0x5015, iwl6030_mac_cfg)},
++	{IWL_PCI_DEVICE(0x0897, 0x5017, iwl6030_mac_cfg)},
++	{IWL_PCI_DEVICE(0x0896, 0x5025, iwl6030_mac_cfg)},
++	{IWL_PCI_DEVICE(0x0896, 0x5027, iwl6030_mac_cfg)},
+ 
+ /* 2x00 Series */
+ 	{IWL_PCI_DEVICE(0x0890, 0x4022, iwl2000_mac_cfg)},
 diff --git a/drivers/pci/controller/Makefile b/drivers/pci/controller/Makefile
 index 038ccbd9e3ba238c98c380a31aa5e1d34ec5fceb..de5e4f5145af8d7d31aac64035981923da450f2e 100644
 --- a/drivers/pci/controller/Makefile
