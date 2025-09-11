@@ -29,7 +29,6 @@
  drivers/watchdog/intel_oc_wdt.c                 |    8 +-
  fs/bcachefs/io_write.c                          |    6 +
  fs/proc/base.c                                  |    2 +-
- fs/proc/generic.c                               |   36 +-
  include/asm-generic/resource.h                  |    2 +-
  include/linux/mm.h                              |    2 +-
  include/linux/sched.h                           |   40 +-
@@ -99,7 +98,7 @@
  net/ipv4/tcp_output.c                           |   48 +-
  net/ipv4/tcp_rate.c                             |   30 +-
  net/ipv4/tcp_timer.c                            |    1 +
- 101 files changed, 14321 insertions(+), 653 deletions(-)
+ 100 files changed, 14302 insertions(+), 636 deletions(-)
 
 diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
 index f6d317e1674d6a501b20c3b050d7976020dab4b9..5856aa83a2ad478e60966830f9a7b901e2d92ba9 100644
@@ -265,13 +264,13 @@ index 0000000000000000000000000000000000000000..05c84eec0f31aca973839b12a918903e
 +priority boost from unblocking while background threads that do most of the
 +processing receive the priority penalty for using their entire timeslice.
 diff --git a/Makefile b/Makefile
-index 58a78d21557742a725bfe8d647b966f9c89e7922..a5d1ce8f3154f658249cbec321b358d0e620a3f7 100644
+index 0200497da26cd09d93f1cf1c1ef10a208acb6de1..94d36ac84b251ba89d340eefb0456aa7a1245045 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -2,8 +2,8 @@
  VERSION = 6
  PATCHLEVEL = 16
- SUBLEVEL = 5
+ SUBLEVEL = 6
 -EXTRAVERSION =
 -NAME = Baby Opossum Posse
 +EXTRAVERSION = -zen1
@@ -760,7 +759,7 @@ index b5cbb57ee5f60073a41d16da23a8d3fa6c09f04a..a0f7fa1518c6607701912d9357be5086
  }
  
 diff --git a/drivers/net/wireless/intel/iwlwifi/pcie/drv.c b/drivers/net/wireless/intel/iwlwifi/pcie/drv.c
-index 0a9e0dbb58fbf7826bc2599afe8b9efa51c7ac51..0ee480480b2c33a4aeb595dc65c243b9be674b0d 100644
+index 4e47ccb43bd86c7d151cf65086dd204dab85e397..edd99d71016cb143b2c8ab23b3e55317e9387365 100644
 --- a/drivers/net/wireless/intel/iwlwifi/pcie/drv.c
 +++ b/drivers/net/wireless/intel/iwlwifi/pcie/drv.c
 @@ -124,13 +124,13 @@ VISIBLE_IF_IWLWIFI_KUNIT const struct pci_device_id iwl_hw_card_ids[] = {
@@ -2684,91 +2683,6 @@ index c667702dc69b8ca2531e88e12ed7a18533f294dd..6694bdc2c1c0f5061c46c111d735c2f9
  		   (unsigned long long)task->sched_info.run_delay,
  		   task->sched_info.pcount);
  
-diff --git a/fs/proc/generic.c b/fs/proc/generic.c
-index e0e50914ab25f208b5a8fb2ea426a7501bc13368..8bc2b960614c08f88d68048a3bd3869c0a80f370 100644
---- a/fs/proc/generic.c
-+++ b/fs/proc/generic.c
-@@ -364,13 +364,32 @@ static const struct inode_operations proc_dir_inode_operations = {
- 	.setattr	= proc_notify_change,
- };
- 
-+static void pde_set_flags(struct proc_dir_entry *pde)
-+{
-+	if (!pde->proc_ops)
-+		return;
-+
-+	if (pde->proc_ops->proc_flags & PROC_ENTRY_PERMANENT)
-+		pde->flags |= PROC_ENTRY_PERMANENT;
-+	if (pde->proc_ops->proc_read_iter)
-+		pde->flags |= PROC_ENTRY_proc_read_iter;
-+#ifdef CONFIG_COMPAT
-+	if (pde->proc_ops->proc_compat_ioctl)
-+		pde->flags |= PROC_ENTRY_proc_compat_ioctl;
-+#endif
-+	if (pde->proc_ops->proc_lseek)
-+		pde->flags |= PROC_ENTRY_proc_lseek;
-+}
-+
- /* returns the registered entry, or frees dp and returns NULL on failure */
- struct proc_dir_entry *proc_register(struct proc_dir_entry *dir,
- 		struct proc_dir_entry *dp)
- {
- 	if (proc_alloc_inum(&dp->low_ino))
- 		goto out_free_entry;
- 
-+	pde_set_flags(dp);
-+
- 	write_lock(&proc_subdir_lock);
- 	dp->parent = dir;
- 	if (pde_subdir_insert(dir, dp) == false) {
-@@ -559,31 +578,16 @@ struct proc_dir_entry *proc_create_reg(const char *name, umode_t mode,
- 	return p;
- }
- 
--static void pde_set_flags(struct proc_dir_entry *pde)
--{
--	if (pde->proc_ops->proc_flags & PROC_ENTRY_PERMANENT)
--		pde->flags |= PROC_ENTRY_PERMANENT;
--	if (pde->proc_ops->proc_read_iter)
--		pde->flags |= PROC_ENTRY_proc_read_iter;
--#ifdef CONFIG_COMPAT
--	if (pde->proc_ops->proc_compat_ioctl)
--		pde->flags |= PROC_ENTRY_proc_compat_ioctl;
--#endif
--	if (pde->proc_ops->proc_lseek)
--		pde->flags |= PROC_ENTRY_proc_lseek;
--}
--
- struct proc_dir_entry *proc_create_data(const char *name, umode_t mode,
- 		struct proc_dir_entry *parent,
- 		const struct proc_ops *proc_ops, void *data)
- {
- 	struct proc_dir_entry *p;
- 
- 	p = proc_create_reg(name, mode, &parent, data);
- 	if (!p)
- 		return NULL;
- 	p->proc_ops = proc_ops;
--	pde_set_flags(p);
- 	return proc_register(parent, p);
- }
- EXPORT_SYMBOL(proc_create_data);
-@@ -634,7 +638,6 @@ struct proc_dir_entry *proc_create_seq_private(const char *name, umode_t mode,
- 	p->proc_ops = &proc_seq_ops;
- 	p->seq_ops = ops;
- 	p->state_size = state_size;
--	pde_set_flags(p);
- 	return proc_register(parent, p);
- }
- EXPORT_SYMBOL(proc_create_seq_private);
-@@ -665,7 +668,6 @@ struct proc_dir_entry *proc_create_single_data(const char *name, umode_t mode,
- 		return NULL;
- 	p->proc_ops = &proc_single_ops;
- 	p->single_show = show;
--	pde_set_flags(p);
- 	return proc_register(parent, p);
- }
- EXPORT_SYMBOL(proc_create_single_data);
 diff --git a/include/asm-generic/resource.h b/include/asm-generic/resource.h
 index 8874f681b056751fa9be3bee4d1a12b86f8fd1b5..59eb72bf7d5fde0ce06f4f3ab740056b2d904673 100644
 --- a/include/asm-generic/resource.h
@@ -14851,7 +14765,7 @@ index 547c1f05b667ef1a381989bb984015c7c3838344..90bfb06bb34eff9e9f084d359c9ca0bb
  }
  
 diff --git a/kernel/sched/topology.c b/kernel/sched/topology.c
-index b958fe48e02051abb578b841ae686299e25de3ca..dbe8882be2788ad699fe7e691cd947dd37616fc1 100644
+index ac36069bd252170e9456232578217bae46028469..7056040f4abed4fd919d4c1aa5005f48291646e2 100644
 --- a/kernel/sched/topology.c
 +++ b/kernel/sched/topology.c
 @@ -3,6 +3,7 @@
@@ -14889,7 +14803,7 @@ index b958fe48e02051abb578b841ae686299e25de3ca..dbe8882be2788ad699fe7e691cd947dd
  #ifdef CONFIG_NUMA
  
  static const struct cpumask *sd_numa_mask(int cpu)
-@@ -2840,3 +2845,31 @@ void partition_sched_domains(int ndoms_new, cpumask_var_t doms_new[],
+@@ -2842,3 +2847,31 @@ void partition_sched_domains(int ndoms_new, cpumask_var_t doms_new[],
  	partition_sched_domains_locked(ndoms_new, doms_new, dattr_new);
  	sched_domains_mutex_unlock();
  }
