@@ -101,7 +101,7 @@
  100 files changed, 14302 insertions(+), 636 deletions(-)
 
 diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index f6d317e1674d6a501b20c3b050d7976020dab4b9..5856aa83a2ad478e60966830f9a7b901e2d92ba9 100644
+index 089e1a395178d3b9af8a6f6860cd26204ea78811..28693b65f079fc68670c015c456b9f4d10d139a8 100644
 --- a/Documentation/admin-guide/kernel-parameters.txt
 +++ b/Documentation/admin-guide/kernel-parameters.txt
 @@ -2336,6 +2336,9 @@
@@ -114,7 +114,7 @@ index f6d317e1674d6a501b20c3b050d7976020dab4b9..5856aa83a2ad478e60966830f9a7b901
                          active
                            Use intel_pstate driver to bypass the scaling
                            governors layer of cpufreq and provides it own
-@@ -4732,6 +4735,15 @@
+@@ -4733,6 +4736,15 @@
  		nomsi		[MSI] If the PCI_MSI kernel config parameter is
  				enabled, this kernel boot option can be used to
  				disable the use of MSI interrupts system-wide.
@@ -264,13 +264,13 @@ index 0000000000000000000000000000000000000000..05c84eec0f31aca973839b12a918903e
 +priority boost from unblocking while background threads that do most of the
 +processing receive the priority penalty for using their entire timeslice.
 diff --git a/Makefile b/Makefile
-index 0200497da26cd09d93f1cf1c1ef10a208acb6de1..94d36ac84b251ba89d340eefb0456aa7a1245045 100644
+index 86359283ccc9a92b8d931f873b9857ca23f226fd..9320440f496871f7f94b5a1040f79ae4cfba087b 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -2,8 +2,8 @@
  VERSION = 6
  PATCHLEVEL = 16
- SUBLEVEL = 6
+ SUBLEVEL = 7
 -EXTRAVERSION =
 -NAME = Baby Opossum Posse
 +EXTRAVERSION = -zen1
