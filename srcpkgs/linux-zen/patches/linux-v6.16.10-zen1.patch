@@ -16,8 +16,8 @@
  drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c         |   10 +
  drivers/gpu/drm/amd/pm/amdgpu_pm.c              |    3 +
  drivers/gpu/drm/amd/pm/swsmu/amdgpu_smu.c       |   14 +-
+ drivers/gpu/drm/i915/display/intel_psr.c        |   10 +-
  drivers/input/evdev.c                           |   19 +-
- drivers/net/wireless/intel/iwlwifi/pcie/drv.c   |   26 +-
  drivers/pci/controller/Makefile                 |    6 +
  drivers/pci/controller/intel-nvme-remap.c       |  462 ++
  drivers/pci/quirks.c                            |  101 +
@@ -98,7 +98,7 @@
  net/ipv4/tcp_output.c                           |   48 +-
  net/ipv4/tcp_rate.c                             |   30 +-
  net/ipv4/tcp_timer.c                            |    1 +
- 100 files changed, 14302 insertions(+), 636 deletions(-)
+ 100 files changed, 14297 insertions(+), 625 deletions(-)
 
 diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
 index 089e1a395178d3b9af8a6f6860cd26204ea78811..28693b65f079fc68670c015c456b9f4d10d139a8 100644
@@ -264,13 +264,13 @@ index 0000000000000000000000000000000000000000..05c84eec0f31aca973839b12a918903e
 +priority boost from unblocking while background threads that do most of the
 +processing receive the priority penalty for using their entire timeslice.
 diff --git a/Makefile b/Makefile
-index 86359283ccc9a92b8d931f873b9857ca23f226fd..9320440f496871f7f94b5a1040f79ae4cfba087b 100644
+index 19856af4819a534f354d6be164189c9852525292..6b76095b2353ab85b4b883d8bd44b81e74aab21b 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -2,8 +2,8 @@
  VERSION = 6
  PATCHLEVEL = 16
- SUBLEVEL = 7
+ SUBLEVEL = 10
 -EXTRAVERSION =
 -NAME = Baby Opossum Posse
 +EXTRAVERSION = -zen1
@@ -576,7 +576,7 @@ index 0e65d37c923113afcc772b5d29372fb65d1fc75b..be91dfe6b3f044571d2ed109bfa3e0ee
  #define MAX_FREQUENCY_UP_THRESHOLD		(100)
  
 diff --git a/drivers/cpufreq/intel_pstate.c b/drivers/cpufreq/intel_pstate.c
-index 06a1c7dd081ffb8ee61ed87ecbc0c20b2638fc43..5a75ec5d7e031b974ed70c2f20a8598dc1a33385 100644
+index 9a85c58922a0c889176c3d21a439a10d9c827a0c..70ae0bee2ae654ba6adf7ef900f8ca1b72cce991 100644
 --- a/drivers/cpufreq/intel_pstate.c
 +++ b/drivers/cpufreq/intel_pstate.c
 @@ -3949,6 +3949,8 @@ static int __init intel_pstate_setup(char *str)
@@ -643,7 +643,7 @@ index f417c5eb0f41a9a5678b29ad9979b4d0a6f19e39..accf1f539f9ee65ea2f0ead69b5b3941
  }
  
 diff --git a/drivers/gpu/drm/amd/pm/swsmu/amdgpu_smu.c b/drivers/gpu/drm/amd/pm/swsmu/amdgpu_smu.c
-index 26b8e232f85825f694b6624803a747847bf4a47c..99f234e488c0de72e4385295b12b2552176b8db0 100644
+index 2278a123db23f9e651d0d5a8e0956fabee61b294..a592cf07457a856bf6ca91ddf6035ae82c2e0f78 100644
 --- a/drivers/gpu/drm/amd/pm/swsmu/amdgpu_smu.c
 +++ b/drivers/gpu/drm/amd/pm/swsmu/amdgpu_smu.c
 @@ -2870,31 +2870,41 @@ int smu_get_power_limit(void *handle,
@@ -690,6 +690,31 @@ index 26b8e232f85825f694b6624803a747847bf4a47c..99f234e488c0de72e4385295b12b2552
  		dev_err(smu->adev->dev,
  			"New power limit (%d) is out of range [%d,%d]\n",
  			limit, smu->min_power_limit, smu->max_power_limit);
+diff --git a/drivers/gpu/drm/i915/display/intel_psr.c b/drivers/gpu/drm/i915/display/intel_psr.c
+index 7da0ad854ed20027252de174531426554b2f5929..43f72c9ce6014fcba49eb4748d5af351a949059b 100644
+--- a/drivers/gpu/drm/i915/display/intel_psr.c
++++ b/drivers/gpu/drm/i915/display/intel_psr.c
+@@ -3359,12 +3359,18 @@ static void _psr_flush_handle(struct intel_dp *intel_dp)
+ 		intel_psr_configure_full_frame_update(intel_dp);
+ 
+ 		intel_psr_force_update(intel_dp);
++	} else if (!intel_dp->psr.psr2_sel_fetch_enabled) {
++		/*
++		 * PSR1 on all platforms
++		 * PSR2 HW tracking
++		 * PR FU
++		 */
++		intel_psr_force_update(intel_dp);
+ 	} else {
+ 		intel_psr_exit(intel_dp);
+ 	}
+ 
+-	if ((!intel_dp->psr.psr2_sel_fetch_enabled || DISPLAY_VER(display) >= 20) &&
+-	    !intel_dp->psr.busy_frontbuffer_bits)
++	if (!intel_dp->psr.active && !intel_dp->psr.busy_frontbuffer_bits)
+ 		queue_work(dev_priv->unordered_wq, &intel_dp->psr.work);
+ }
+ 
 diff --git a/drivers/input/evdev.c b/drivers/input/evdev.c
 index b5cbb57ee5f60073a41d16da23a8d3fa6c09f04a..a0f7fa1518c6607701912d9357be50865175ec44 100644
 --- a/drivers/input/evdev.c
@@ -758,50 +783,6 @@ index b5cbb57ee5f60073a41d16da23a8d3fa6c09f04a..a0f7fa1518c6607701912d9357be5086
  	return error;
  }
  
-diff --git a/drivers/net/wireless/intel/iwlwifi/pcie/drv.c b/drivers/net/wireless/intel/iwlwifi/pcie/drv.c
-index 4e47ccb43bd86c7d151cf65086dd204dab85e397..edd99d71016cb143b2c8ab23b3e55317e9387365 100644
---- a/drivers/net/wireless/intel/iwlwifi/pcie/drv.c
-+++ b/drivers/net/wireless/intel/iwlwifi/pcie/drv.c
-@@ -124,13 +124,13 @@ VISIBLE_IF_IWLWIFI_KUNIT const struct pci_device_id iwl_hw_card_ids[] = {
- 	{IWL_PCI_DEVICE(0x0082, 0x1304, iwl6005_mac_cfg)},/* low 5GHz active */
- 	{IWL_PCI_DEVICE(0x0082, 0x1305, iwl6005_mac_cfg)},/* high 5GHz active */
- 
--/* 6x30 Series */
--	{IWL_PCI_DEVICE(0x008A, 0x5305, iwl1000_mac_cfg)},
--	{IWL_PCI_DEVICE(0x008A, 0x5307, iwl1000_mac_cfg)},
--	{IWL_PCI_DEVICE(0x008A, 0x5325, iwl1000_mac_cfg)},
--	{IWL_PCI_DEVICE(0x008A, 0x5327, iwl1000_mac_cfg)},
--	{IWL_PCI_DEVICE(0x008B, 0x5315, iwl1000_mac_cfg)},
--	{IWL_PCI_DEVICE(0x008B, 0x5317, iwl1000_mac_cfg)},
-+/* 1030/6x30 Series */
-+	{IWL_PCI_DEVICE(0x008A, 0x5305, iwl6030_mac_cfg)},
-+	{IWL_PCI_DEVICE(0x008A, 0x5307, iwl6030_mac_cfg)},
-+	{IWL_PCI_DEVICE(0x008A, 0x5325, iwl6030_mac_cfg)},
-+	{IWL_PCI_DEVICE(0x008A, 0x5327, iwl6030_mac_cfg)},
-+	{IWL_PCI_DEVICE(0x008B, 0x5315, iwl6030_mac_cfg)},
-+	{IWL_PCI_DEVICE(0x008B, 0x5317, iwl6030_mac_cfg)},
- 	{IWL_PCI_DEVICE(0x0090, 0x5211, iwl6030_mac_cfg)},
- 	{IWL_PCI_DEVICE(0x0090, 0x5215, iwl6030_mac_cfg)},
- 	{IWL_PCI_DEVICE(0x0090, 0x5216, iwl6030_mac_cfg)},
-@@ -181,12 +181,12 @@ VISIBLE_IF_IWLWIFI_KUNIT const struct pci_device_id iwl_hw_card_ids[] = {
- 	{IWL_PCI_DEVICE(0x08AE, 0x1027, iwl1000_mac_cfg)},
- 
- /* 130 Series WiFi */
--	{IWL_PCI_DEVICE(0x0896, 0x5005, iwl1000_mac_cfg)},
--	{IWL_PCI_DEVICE(0x0896, 0x5007, iwl1000_mac_cfg)},
--	{IWL_PCI_DEVICE(0x0897, 0x5015, iwl1000_mac_cfg)},
--	{IWL_PCI_DEVICE(0x0897, 0x5017, iwl1000_mac_cfg)},
--	{IWL_PCI_DEVICE(0x0896, 0x5025, iwl1000_mac_cfg)},
--	{IWL_PCI_DEVICE(0x0896, 0x5027, iwl1000_mac_cfg)},
-+	{IWL_PCI_DEVICE(0x0896, 0x5005, iwl6030_mac_cfg)},
-+	{IWL_PCI_DEVICE(0x0896, 0x5007, iwl6030_mac_cfg)},
-+	{IWL_PCI_DEVICE(0x0897, 0x5015, iwl6030_mac_cfg)},
-+	{IWL_PCI_DEVICE(0x0897, 0x5017, iwl6030_mac_cfg)},
-+	{IWL_PCI_DEVICE(0x0896, 0x5025, iwl6030_mac_cfg)},
-+	{IWL_PCI_DEVICE(0x0896, 0x5027, iwl6030_mac_cfg)},
- 
- /* 2x00 Series */
- 	{IWL_PCI_DEVICE(0x0890, 0x4022, iwl2000_mac_cfg)},
 diff --git a/drivers/pci/controller/Makefile b/drivers/pci/controller/Makefile
 index 038ccbd9e3ba238c98c380a31aa5e1d34ec5fceb..de5e4f5145af8d7d31aac64035981923da450f2e 100644
 --- a/drivers/pci/controller/Makefile
@@ -3667,7 +3648,7 @@ index bb184a67ac73ce758f71f1979f774539a9be4ebb..bd1ea422fd145bfa153c24d03031beaa
  	release_thread(p);
  	/*
 diff --git a/kernel/fork.c b/kernel/fork.c
-index 1ee8eb11f38bae1d2eb6de9494aea94b7a19e6c3..59d8c7ba6c5400aa70ebd80b2ddcc98882ae3971 100644
+index 0cbc174da76acea7ed29ee04c6277a7e0987a76c..dc679a796326e9afdcfcc3fc972f07839c93b698 100644
 --- a/kernel/fork.c
 +++ b/kernel/fork.c
 @@ -122,6 +122,12 @@
@@ -14971,7 +14952,7 @@ index 553fa469d7ccfb0b98641d128c5e161588c79f54..d7c90f6ff00905f03ceabf4e4841de55
  		}
  	}
 diff --git a/kernel/trace/trace_osnoise.c b/kernel/trace/trace_osnoise.c
-index fd259da0aa64569be60ab0fba28d76f2a021624a..c51da39ec059e8122d4488083d916c09e8b5b16f 100644
+index dc734867f0fc441570cdca0b5d10477bc5af4b7b..9ce22f6282eb89487177f1712f915959967415b5 100644
 --- a/kernel/trace/trace_osnoise.c
 +++ b/kernel/trace/trace_osnoise.c
 @@ -1645,27 +1645,31 @@ static void osnoise_sleep(bool skip_period)
@@ -15206,10 +15187,10 @@ index 2ef3c07266b34dfa516d6d564801023d25f71715..61b48f391ab8f33fba79354769923351
  }
  
 diff --git a/mm/swap.c b/mm/swap.c
-index 4fc322f7111a98fc16afca4498fedcebbab1ada3..286f2bb5c724d676b9c9311292e5d04ab7657945 100644
+index a524736323c8b759fd3cadf004da72b97335ce6b..0ea1e13f3f198a4e62a4ccba0dbaf96a1750fd88 100644
 --- a/mm/swap.c
 +++ b/mm/swap.c
-@@ -1091,17 +1091,22 @@ static const struct ctl_table swap_sysctl_table[] = {
+@@ -1093,17 +1093,22 @@ static const struct ctl_table swap_sysctl_table[] = {
   */
  void __init swap_setup(void)
  {
@@ -15233,7 +15214,7 @@ index 4fc322f7111a98fc16afca4498fedcebbab1ada3..286f2bb5c724d676b9c9311292e5d04a
  	register_sysctl_init("vm", swap_sysctl_table);
  }
 diff --git a/mm/vmscan.c b/mm/vmscan.c
-index 424412680cfcc646c1d671fd2c7eccb5600b21e4..3bb870b1eca2b797c36c26e3f225608ca73344a5 100644
+index b7ed263e6dd7011033d4a9c3a276b36405ea032f..eb40000abe04952933e2f63c01c0e59b922335b5 100644
 --- a/mm/vmscan.c
 +++ b/mm/vmscan.c
 @@ -6471,31 +6471,35 @@ static unsigned long do_try_to_free_pages(struct zonelist *zonelist,
@@ -15385,10 +15366,10 @@ index e01492234b0b349498f8e56c2f07d8bba092c00e..27893b774e086d0ccf8015b7c6b78f9a
  	.undo_cwnd = bpf_tcp_ca_undo_cwnd,
  	.sndbuf_expand = bpf_tcp_ca_sndbuf_expand,
 diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 461a9ab540af0248ae1343d2704758ff6f50277c..02ae796fa17eab9b10754f2579d678a7b31d7241 100644
+index 98da33e0c308b002598fc1ae46efe479c1660292..848968b9f94dcee14c3ff52e2f940134e73f505d 100644
 --- a/net/ipv4/tcp.c
 +++ b/net/ipv4/tcp.c
-@@ -3442,6 +3442,7 @@ int tcp_disconnect(struct sock *sk, int flags)
+@@ -3443,6 +3443,7 @@ int tcp_disconnect(struct sock *sk, int flags)
  	tp->rx_opt.dsack = 0;
  	tp->rx_opt.num_sacks = 0;
  	tp->rcv_ooopack = 0;
@@ -15396,7 +15377,7 @@ index 461a9ab540af0248ae1343d2704758ff6f50277c..02ae796fa17eab9b10754f2579d678a7
  
  
  	/* Clean up fastopen related fields */
-@@ -4189,6 +4190,8 @@ void tcp_get_info(struct sock *sk, struct tcp_info *info)
+@@ -4194,6 +4195,8 @@ void tcp_get_info(struct sock *sk, struct tcp_info *info)
  		info->tcpi_options |= TCPI_OPT_ECN;
  	if (tp->ecn_flags & TCP_ECN_SEEN)
  		info->tcpi_options |= TCPI_OPT_ECN_SEEN;
