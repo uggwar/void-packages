@@ -264,13 +264,13 @@ index 0000000000000000000000000000000000000000..05c84eec0f31aca973839b12a918903e
 +priority boost from unblocking while background threads that do most of the
 +processing receive the priority penalty for using their entire timeslice.
 diff --git a/Makefile b/Makefile
-index 570042d208fd3e617254415c4f03c795a2250c1f..8a5b92a9d240988e1469130520a46932b3761640 100644
+index 1383a6e417a4654bbbc32be91fceb40207beafb6..03e0fb8b7108907e42309756028e5bbd6512f68a 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -2,8 +2,8 @@
  VERSION = 6
  PATCHLEVEL = 17
- SUBLEVEL = 7
+ SUBLEVEL = 8
 -EXTRAVERSION =
 -NAME = Baby Opossum Posse
 +EXTRAVERSION = -zen1
@@ -301,15 +301,15 @@ index 570042d208fd3e617254415c4f03c795a2250c1f..8a5b92a9d240988e1469130520a46932
  KBUILD_CFLAGS += -fno-builtin-wcslen
  
 diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-index 1913d342969ba25227cd700f214434ceff9afbe6..36c49b3aeda464ca23a78ed81eb9fc08eeea7875 100644
+index 9c32f588d4518852e58db7677dadf26338b6e415..29eb55038804a24d4d6fa8fc6fb77db6f9769da4 100644
 --- a/arch/x86/Makefile
 +++ b/arch/x86/Makefile
 @@ -74,7 +74,7 @@ export BITS
  #
  #    https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53383
  #
--KBUILD_CFLAGS += -mno-sse -mno-mmx -mno-sse2 -mno-3dnow -mno-avx
-+KBUILD_CFLAGS += -mno-sse -mno-mmx -mno-sse2 -mno-3dnow -mno-avx -mno-avx2 -fno-tree-vectorize
+-KBUILD_CFLAGS += -mno-sse -mno-mmx -mno-sse2 -mno-3dnow -mno-avx -mno-sse4a
++KBUILD_CFLAGS += -mno-sse -mno-mmx -mno-sse2 -mno-3dnow -mno-avx -mno-sse4a -mno-avx2 -fno-tree-vectorize
  KBUILD_RUSTFLAGS += --target=$(objtree)/scripts/target.json
  KBUILD_RUSTFLAGS += -Ctarget-feature=-sse,-sse2,-sse3,-ssse3,-sse4.1,-sse4.2,-avx,-avx2
  
@@ -553,7 +553,7 @@ index 2c5c228408bf2820f02acad14904596a25b213d6..918e2bebfe788fb9fe62c2d1705b7dea
  	  This driver adds a CPUFreq driver which utilizes a fine grain
  	  processor performance frequency control range instead of legacy
 diff --git a/drivers/cpufreq/cpufreq_ondemand.c b/drivers/cpufreq/cpufreq_ondemand.c
-index 0e65d37c923113afcc772b5d29372fb65d1fc75b..be91dfe6b3f044571d2ed109bfa3e0ee81a7af59 100644
+index a6ecc203f7b7f37d32f4e44fb6eaa81ec7e481b5..46ea23cbb754372dc23ae5b5712d7e80777ee261 100644
 --- a/drivers/cpufreq/cpufreq_ondemand.c
 +++ b/drivers/cpufreq/cpufreq_ondemand.c
 @@ -18,10 +18,16 @@
@@ -601,7 +601,7 @@ index ef3af170dda4ebb4b9092d49fe1f7ecc0f4fb12e..cf918b18db53000908d8de3495397dd8
  extern int amdgpu_gart_size;
  extern int amdgpu_gtt_size;
 diff --git a/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c
-index 65f4a76490eacc3ec5d1d203fc67d824b44f6f59..72ca35acd44adb540077b91ed3576f39522d15ee 100644
+index e60043ac9841efb2664ce3f495231d42352289eb..5b116d7d880fe1d5a52f92bbd10aaebd1fde926c 100644
 --- a/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c
 +++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c
 @@ -148,6 +148,7 @@ enum AMDGPU_DEBUG_MASK {
@@ -629,10 +629,10 @@ index 65f4a76490eacc3ec5d1d203fc67d824b44f6f59..72ca35acd44adb540077b91ed3576f39
   * DOC: vramlimit (int)
   * Restrict the total amount of VRAM in MiB for testing.  The default is 0 (Use full VRAM).
 diff --git a/drivers/gpu/drm/amd/pm/amdgpu_pm.c b/drivers/gpu/drm/amd/pm/amdgpu_pm.c
-index 5fbfe7333b54df51942c43b8bf2577cf7270c561..9e81953043becdfae88e89214503e34d73b88666 100644
+index 1fca183827c7c490b9d79836b98cb74163092e80..162d861fe8214bf57ac7d6553974a47edabcb188 100644
 --- a/drivers/gpu/drm/amd/pm/amdgpu_pm.c
 +++ b/drivers/gpu/drm/amd/pm/amdgpu_pm.c
-@@ -3073,6 +3073,9 @@ static ssize_t amdgpu_hwmon_show_power_cap_min(struct device *dev,
+@@ -3074,6 +3074,9 @@ static ssize_t amdgpu_hwmon_show_power_cap_min(struct device *dev,
  					 struct device_attribute *attr,
  					 char *buf)
  {
@@ -643,10 +643,10 @@ index 5fbfe7333b54df51942c43b8bf2577cf7270c561..9e81953043becdfae88e89214503e34d
  }
  
 diff --git a/drivers/gpu/drm/amd/pm/swsmu/amdgpu_smu.c b/drivers/gpu/drm/amd/pm/swsmu/amdgpu_smu.c
-index 408f05dfab9015694f31eb9029b1c62d61b7ee0c..4eb99b74a04fb0c5df206e70d382be9ca97424a9 100644
+index 70065c41e92314e8f77585ca2d4d65cc5dbabdce..3758eee890dce7439a916c858212f776ca94ea17 100644
 --- a/drivers/gpu/drm/amd/pm/swsmu/amdgpu_smu.c
 +++ b/drivers/gpu/drm/amd/pm/swsmu/amdgpu_smu.c
-@@ -2921,31 +2921,41 @@ int smu_get_power_limit(void *handle,
+@@ -2927,31 +2927,41 @@ int smu_get_power_limit(void *handle,
  			*limit = smu->max_power_limit;
  			break;
  		case SMU_PPT_LIMIT_MIN:
@@ -1337,10 +1337,10 @@ index 0000000000000000000000000000000000000000..e105e6f5cc91d1b99db4c9b1c79b500b
 +MODULE_AUTHOR("Daniel Drake <drake@endlessm.com>");
 +MODULE_LICENSE("GPL v2");
 diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
-index d97335a401930fe8204e7ca91a8474b6b02554c1..acab5556a354cba1e5da97e7495968ba714ad5eb 100644
+index 214ed060ca1b3da6b15b70e63bedfc48eec426c0..00c7b6fc67960e13d6570d70e278053dd93d6b51 100644
 --- a/drivers/pci/quirks.c
 +++ b/drivers/pci/quirks.c
-@@ -3745,6 +3745,106 @@ static void quirk_no_bus_reset(struct pci_dev *dev)
+@@ -3746,6 +3746,106 @@ static void quirk_no_bus_reset(struct pci_dev *dev)
  	dev->dev_flags |= PCI_DEV_FLAGS_NO_BUS_RESET;
  }
  
@@ -1447,7 +1447,7 @@ index d97335a401930fe8204e7ca91a8474b6b02554c1..acab5556a354cba1e5da97e7495968ba
  /*
   * Some NVIDIA GPU devices do not work with bus reset, SBR needs to be
   * prevented for those affected devices.
-@@ -5192,6 +5292,7 @@ static const struct pci_dev_acs_enabled {
+@@ -5193,6 +5293,7 @@ static const struct pci_dev_acs_enabled {
  	{ PCI_VENDOR_ID_ZHAOXIN, PCI_ANY_ID, pci_quirk_zhaoxin_pcie_ports_acs },
  	/* Wangxun nics */
  	{ PCI_VENDOR_ID_WANGXUN, PCI_ANY_ID, pci_quirk_wangxun_nic_acs },
@@ -2954,7 +2954,7 @@ index 57e478bfaef20369f5dba1cff540e52c9302ebf4..0ea92792629c9ecb4c1f0631c6331322
  
  	/* RX read-write hotpath cache lines */
 diff --git a/include/net/inet_connection_sock.h b/include/net/inet_connection_sock.h
-index 1735db332aab56173e45e8754c8d17b21e7e77c5..2c4a94af709353078c0881f3a22582c23a340a18 100644
+index 072347f164830be75dbd2aef94abb5a55752f9b3..070401c01d4c24a94c96512887f8efea4067eae7 100644
 --- a/include/net/inet_connection_sock.h
 +++ b/include/net/inet_connection_sock.h
 @@ -132,8 +132,8 @@ struct inet_connection_sock {
@@ -15169,7 +15169,7 @@ index e01492234b0b349498f8e56c2f07d8bba092c00e..27893b774e086d0ccf8015b7c6b78f9a
  	.undo_cwnd = bpf_tcp_ca_undo_cwnd,
  	.sndbuf_expand = bpf_tcp_ca_sndbuf_expand,
 diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index ba36f558f144c6e542bb59cea94616499d9b05b0..fda4c8deb5d821ee934c7e2c9df2c571f4264332 100644
+index f421cad69d8c94ecf39fd47a56b2593b282ba7db..d2602b000fbbddf55e6c4a836edf552e3ca69954 100644
 --- a/net/ipv4/tcp.c
 +++ b/net/ipv4/tcp.c
 @@ -3444,6 +3444,7 @@ int tcp_disconnect(struct sock *sk, int flags)
