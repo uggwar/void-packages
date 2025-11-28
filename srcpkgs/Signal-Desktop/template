@@ -1,11 +1,11 @@
 # Template file for 'Signal-Desktop'
 pkgname=Signal-Desktop
-version=7.80.0
+version=7.80.1
 revision=1
 # *-musl could potentially work based on the Alpine port:
 # https://git.alpinelinux.org/aports/tree/testing/signal-desktop
 archs="x86_64 aarch64"
-hostmakedepends="python3-distutils-extra pnpm electron-tasje"
+hostmakedepends="python3-distutils-extra pnpm electron-tasje tar"
 depends="cairo gtk+3 libvips pango desktop-file-utils hicolor-icon-theme"
 checkdepends="glib nss libgbm alsa-lib ${depends}"
 short_desc="Signal Private Messenger for Linux"
@@ -13,7 +13,7 @@ maintainer="dkwo <npiazza@disroot.org>"
 license="AGPL-3.0-only"
 homepage="https://github.com/signalapp/Signal-Desktop"
 distfiles="https://github.com/signalapp/Signal-Desktop/archive/v${version}.tar.gz"
-checksum=175554a79f28ed75d883294e2e53e5da72352b5a963afc1e1c6380cfca3fba45
+checksum=d0d57cd972f58d3c388b79a78ba594a73a54602932febcaa80741f45f65bf0be
 nostrip_files="signal-desktop"
 nocross="gyp -> aarch64-linux-gnu-gcc: error: unrecognized command-line option '-m64'"
 
