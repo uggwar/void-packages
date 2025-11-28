@@ -1,104 +1,102 @@
- Documentation/admin-guide/kernel-parameters.txt   |   12 +
- Documentation/admin-guide/sysctl/kernel.rst       |    9 +
- Documentation/scheduler/sched-BMQ.txt             |  110 +
- Makefile                                          |   12 +-
- arch/x86/Makefile                                 |    2 +-
- arch/x86/include/asm/pci.h                        |    6 +
- arch/x86/pci/common.c                             |    7 +-
- block/elevator.c                                  |   23 +-
- drivers/Makefile                                  |   13 +-
- drivers/ata/ahci.c                                |   23 +-
- drivers/ata/libahci.c                             |    2 +-
- drivers/cpufreq/Kconfig.x86                       |    2 -
- drivers/cpufreq/cpufreq_ondemand.c                |   10 +-
- drivers/cpufreq/intel_pstate.c                    |    2 +
- drivers/gpu/drm/amd/amdgpu/amdgpu.h               |    1 +
- drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c           |   10 +
- drivers/gpu/drm/amd/pm/amdgpu_pm.c                |    3 +
- drivers/gpu/drm/amd/pm/swsmu/amdgpu_smu.c         |   14 +-
- drivers/gpu/drm/i915/display/intel_psr.c          |   12 +-
- drivers/input/evdev.c                             |   19 +-
- drivers/net/wireless/intel/iwlwifi/mvm/mac-ctxt.c |   13 +-
- drivers/net/wireless/intel/iwlwifi/mvm/utils.c    |   12 +-
- drivers/pci/controller/Makefile                   |    6 +
- drivers/pci/controller/intel-nvme-remap.c         |  462 ++
- drivers/pci/quirks.c                              |  101 +
- drivers/scsi/Kconfig                              |    2 +
- drivers/scsi/Makefile                             |    1 +
- drivers/scsi/vhba/Kconfig                         |    9 +
- drivers/scsi/vhba/Makefile                        |    4 +
- drivers/scsi/vhba/vhba.c                          | 1132 +++
- fs/bcachefs/io_write.c                            |    6 +
- fs/proc/base.c                                    |    2 +-
- include/asm-generic/resource.h                    |    2 +-
- include/linux/mm.h                                |    2 +-
- include/linux/sched.h                             |   36 +
- include/linux/sched/deadline.h                    |   20 +
- include/linux/sched/prio.h                        |   22 +
- include/linux/sched/rt.h                          |    2 +
- include/linux/sched/topology.h                    |    3 +-
- include/linux/tcp.h                               |    6 +-
- include/net/inet_connection_sock.h                |    4 +-
- include/net/tcp.h                                 |   72 +-
- include/uapi/linux/inet_diag.h                    |   23 +
- include/uapi/linux/rtnetlink.h                    |    4 +-
- include/uapi/linux/tcp.h                          |    1 +
- init/Kconfig                                      |   90 +
- init/Makefile                                     |    2 +-
- init/init_task.c                                  |   20 +
- kernel/Kconfig.preempt                            |    6 +-
- kernel/cgroup/cpuset.c                            |   10 +-
- kernel/delayacct.c                                |    2 +-
- kernel/exit.c                                     |    6 +-
- kernel/fork.c                                     |   28 +
- kernel/locking/rtmutex.c                          |   16 +-
- kernel/locking/ww_mutex.h                         |    2 +
- kernel/sched/Makefile                             |    5 +
- kernel/sched/alt_core.c                           | 7649 +++++++++++++++++++++
- kernel/sched/alt_core.h                           |  174 +
- kernel/sched/alt_debug.c                          |   32 +
- kernel/sched/alt_sched.h                          | 1013 +++
- kernel/sched/alt_topology.c                       |  287 +
- kernel/sched/alt_topology.h                       |  113 +
- kernel/sched/bmq.h                                |  103 +
- kernel/sched/build_policy.c                       |    8 +-
- kernel/sched/build_utility.c                      |   10 +-
- kernel/sched/cpufreq_schedutil.c                  |   10 +-
- kernel/sched/cputime.c                            |   10 +-
- kernel/sched/debug.c                              |   20 +
- kernel/sched/fair.c                               |   13 +
- kernel/sched/idle.c                               |    2 +
- kernel/sched/pds.h                                |  139 +
- kernel/sched/pelt.c                               |    6 +-
- kernel/sched/pelt.h                               |    6 +-
- kernel/sched/sched.h                              |   11 +-
- kernel/sched/stats.c                              |    4 +
- kernel/sched/stats.h                              |    2 +
- kernel/sched/syscalls.c                           |  281 +-
- kernel/sched/topology.c                           |   33 +
- kernel/sysctl.c                                   |   15 +
- kernel/time/posix-cpu-timers.c                    |   10 +-
- kernel/time/timer.c                               |    4 +
- kernel/trace/trace_osnoise.c                      |    4 +
- kernel/trace/trace_selftest.c                     |    5 +
- kernel/workqueue.c                                |   15 +
- mm/Kconfig                                        |    2 +-
- mm/huge_memory.c                                  |    4 +
- mm/internal.h                                     |    1 +
- mm/page_alloc.c                                   |   21 +-
- mm/swap.c                                         |    5 +
- mm/vmscan.c                                       |   19 +-
- net/ipv4/Kconfig                                  |   21 +-
- net/ipv4/bpf_tcp_ca.c                             |    4 +-
- net/ipv4/tcp.c                                    |    3 +
- net/ipv4/tcp_bbr.c                                | 2175 ++++--
- net/ipv4/tcp_cong.c                               |    1 +
- net/ipv4/tcp_input.c                              |   40 +-
- net/ipv4/tcp_minisocks.c                          |    2 +
- net/ipv4/tcp_output.c                             |   48 +-
- net/ipv4/tcp_rate.c                               |   30 +-
- net/ipv4/tcp_timer.c                              |    1 +
- 100 files changed, 14146 insertions(+), 636 deletions(-)
+ Documentation/admin-guide/kernel-parameters.txt |   12 +
+ Documentation/admin-guide/sysctl/kernel.rst     |    9 +
+ Documentation/scheduler/sched-BMQ.txt           |  110 +
+ Makefile                                        |   12 +-
+ arch/x86/Makefile                               |    2 +-
+ arch/x86/include/asm/pci.h                      |    6 +
+ arch/x86/pci/common.c                           |    7 +-
+ block/elevator.c                                |   23 +-
+ drivers/Makefile                                |   13 +-
+ drivers/ata/ahci.c                              |   23 +-
+ drivers/ata/libahci.c                           |    2 +-
+ drivers/cpufreq/Kconfig.x86                     |    2 -
+ drivers/cpufreq/cpufreq_ondemand.c              |   10 +-
+ drivers/cpufreq/intel_pstate.c                  |    2 +
+ drivers/gpu/drm/amd/amdgpu/amdgpu.h             |    1 +
+ drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c         |   10 +
+ drivers/gpu/drm/amd/pm/amdgpu_pm.c              |    3 +
+ drivers/gpu/drm/amd/pm/swsmu/amdgpu_smu.c       |   14 +-
+ drivers/gpu/drm/i915/display/intel_psr.c        |   12 +-
+ drivers/input/evdev.c                           |   19 +-
+ drivers/pci/controller/Makefile                 |    6 +
+ drivers/pci/controller/intel-nvme-remap.c       |  462 ++
+ drivers/pci/quirks.c                            |  101 +
+ drivers/scsi/Kconfig                            |    2 +
+ drivers/scsi/Makefile                           |    1 +
+ drivers/scsi/vhba/Kconfig                       |    9 +
+ drivers/scsi/vhba/Makefile                      |    4 +
+ drivers/scsi/vhba/vhba.c                        | 1132 ++++
+ fs/bcachefs/io_write.c                          |    6 +
+ fs/proc/base.c                                  |    2 +-
+ include/asm-generic/resource.h                  |    2 +-
+ include/linux/mm.h                              |    2 +-
+ include/linux/sched.h                           |   36 +
+ include/linux/sched/deadline.h                  |   20 +
+ include/linux/sched/prio.h                      |   22 +
+ include/linux/sched/rt.h                        |    2 +
+ include/linux/sched/topology.h                  |    3 +-
+ include/linux/tcp.h                             |    6 +-
+ include/net/inet_connection_sock.h              |    4 +-
+ include/net/tcp.h                               |   72 +-
+ include/uapi/linux/inet_diag.h                  |   23 +
+ include/uapi/linux/rtnetlink.h                  |    4 +-
+ include/uapi/linux/tcp.h                        |    1 +
+ init/Kconfig                                    |   90 +
+ init/Makefile                                   |    2 +-
+ init/init_task.c                                |   20 +
+ kernel/Kconfig.preempt                          |    6 +-
+ kernel/cgroup/cpuset.c                          |   10 +-
+ kernel/delayacct.c                              |    2 +-
+ kernel/exit.c                                   |    6 +-
+ kernel/fork.c                                   |   28 +
+ kernel/locking/rtmutex.c                        |   16 +-
+ kernel/locking/ww_mutex.h                       |    2 +
+ kernel/sched/Makefile                           |    5 +
+ kernel/sched/alt_core.c                         | 7640 +++++++++++++++++++++++
+ kernel/sched/alt_core.h                         |  175 +
+ kernel/sched/alt_debug.c                        |   32 +
+ kernel/sched/alt_sched.h                        | 1013 +++
+ kernel/sched/alt_topology.c                     |  287 +
+ kernel/sched/alt_topology.h                     |  113 +
+ kernel/sched/bmq.h                              |  103 +
+ kernel/sched/build_policy.c                     |    8 +-
+ kernel/sched/build_utility.c                    |   10 +-
+ kernel/sched/cpufreq_schedutil.c                |   10 +-
+ kernel/sched/cputime.c                          |   10 +-
+ kernel/sched/debug.c                            |   20 +
+ kernel/sched/fair.c                             |   13 +
+ kernel/sched/idle.c                             |    2 +
+ kernel/sched/pds.h                              |  139 +
+ kernel/sched/pelt.c                             |    6 +-
+ kernel/sched/pelt.h                             |    6 +-
+ kernel/sched/sched.h                            |   11 +-
+ kernel/sched/stats.c                            |    4 +
+ kernel/sched/stats.h                            |    2 +
+ kernel/sched/syscalls.c                         |  281 +-
+ kernel/sched/topology.c                         |   33 +
+ kernel/sysctl.c                                 |   15 +
+ kernel/time/posix-cpu-timers.c                  |   10 +-
+ kernel/time/timer.c                             |    4 +
+ kernel/trace/trace_osnoise.c                    |    4 +
+ kernel/trace/trace_selftest.c                   |    5 +
+ kernel/workqueue.c                              |   15 +
+ mm/Kconfig                                      |    2 +-
+ mm/huge_memory.c                                |    4 +
+ mm/internal.h                                   |    1 +
+ mm/page_alloc.c                                 |   21 +-
+ mm/swap.c                                       |    5 +
+ mm/vmscan.c                                     |   19 +-
+ net/ipv4/Kconfig                                |   21 +-
+ net/ipv4/bpf_tcp_ca.c                           |    4 +-
+ net/ipv4/tcp.c                                  |    3 +
+ net/ipv4/tcp_bbr.c                              | 2175 +++++--
+ net/ipv4/tcp_cong.c                             |    1 +
+ net/ipv4/tcp_input.c                            |   40 +-
+ net/ipv4/tcp_minisocks.c                        |    2 +
+ net/ipv4/tcp_output.c                           |   48 +-
+ net/ipv4/tcp_rate.c                             |   30 +-
+ net/ipv4/tcp_timer.c                            |    1 +
+ 98 files changed, 14126 insertions(+), 623 deletions(-)
 
 diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
 index e92c0056e4e0a6b14ac9b1c0c66147f735b4f8b5..2e6b508babd8a536254a9ed44b5ada51d93d8288 100644
@@ -264,13 +262,13 @@ index 0000000000000000000000000000000000000000..05c84eec0f31aca973839b12a918903e
 +priority boost from unblocking while background threads that do most of the
 +processing receive the priority penalty for using their entire timeslice.
 diff --git a/Makefile b/Makefile
-index 1383a6e417a4654bbbc32be91fceb40207beafb6..03e0fb8b7108907e42309756028e5bbd6512f68a 100644
+index 8b61f038a365d3cac47bfcdd745bb75d233fdf86..4635858b538cccb3ca146e0a4a59a7e8b677a967 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -2,8 +2,8 @@
  VERSION = 6
  PATCHLEVEL = 17
- SUBLEVEL = 8
+ SUBLEVEL = 9
 -EXTRAVERSION =
 -NAME = Baby Opossum Posse
 +EXTRAVERSION = -zen1
@@ -576,10 +574,10 @@ index a6ecc203f7b7f37d32f4e44fb6eaa81ec7e481b5..46ea23cbb754372dc23ae5b5712d7e80
  #define MAX_FREQUENCY_UP_THRESHOLD		(100)
  
 diff --git a/drivers/cpufreq/intel_pstate.c b/drivers/cpufreq/intel_pstate.c
-index fc02a3542f65694ee06b7d883d60817f001eac6b..3d0a8db2f425a2dfcdb2eaad4678fed7a0d5b217 100644
+index 99c80249fde8877bdae09021dcddf840e04a1d15..48fca0344babf07c7ec944795c1f6ab7809e38ea 100644
 --- a/drivers/cpufreq/intel_pstate.c
 +++ b/drivers/cpufreq/intel_pstate.c
-@@ -3952,6 +3952,8 @@ static int __init intel_pstate_setup(char *str)
+@@ -3951,6 +3951,8 @@ static int __init intel_pstate_setup(char *str)
  
  	if (!strcmp(str, "disable"))
  		no_load = 1;
@@ -691,10 +689,10 @@ index 70065c41e92314e8f77585ca2d4d65cc5dbabdce..3758eee890dce7439a916c858212f776
  			"New power limit (%d) is out of range [%d,%d]\n",
  			limit, smu->min_power_limit, smu->max_power_limit);
 diff --git a/drivers/gpu/drm/i915/display/intel_psr.c b/drivers/gpu/drm/i915/display/intel_psr.c
-index 41988e193a415cc16c937f6f799215aa866538ec..d19e3e7a9451107651263413bb153eadbfaffd81 100644
+index 85e9aad7ec507f4dde077d8bf2e4b4ab9a8f391c..78eb59b3262b05b562d2a097e73937801ccfdf0c 100644
 --- a/drivers/gpu/drm/i915/display/intel_psr.c
 +++ b/drivers/gpu/drm/i915/display/intel_psr.c
-@@ -3364,30 +3364,38 @@ static void _psr_flush_handle(struct intel_dp *intel_dp)
+@@ -3365,30 +3365,38 @@ static void _psr_flush_handle(struct intel_dp *intel_dp)
  	struct intel_display *display = to_intel_display(intel_dp);
  
  	if (DISPLAY_VER(display) < 20 && intel_dp->psr.psr2_sel_fetch_enabled) {
@@ -803,56 +801,6 @@ index 90ff6be85cf466bb519adf5df2b0d23b7544c563..15159c1cf6e1a015a89f03b3f45c5249
  	return error;
  }
  
-diff --git a/drivers/net/wireless/intel/iwlwifi/mvm/mac-ctxt.c b/drivers/net/wireless/intel/iwlwifi/mvm/mac-ctxt.c
-index 8805ab344895a14e74787850acce4dc7f6839155..0065c2ead56b1596cfc3e691c75d07aa84bbe3ed 100644
---- a/drivers/net/wireless/intel/iwlwifi/mvm/mac-ctxt.c
-+++ b/drivers/net/wireless/intel/iwlwifi/mvm/mac-ctxt.c
-@@ -938,19 +938,12 @@ u8 iwl_mvm_mac_ctxt_get_lowest_rate(struct iwl_mvm *mvm,
- 
- u16 iwl_mvm_mac_ctxt_get_beacon_flags(const struct iwl_fw *fw, u8 rate_idx)
- {
-+	u16 flags = iwl_mvm_mac80211_idx_to_hwrate(fw, rate_idx);
- 	bool is_new_rate = iwl_fw_lookup_cmd_ver(fw, BEACON_TEMPLATE_CMD, 0) > 10;
--	u16 flags, cck_flag;
--
--	if (is_new_rate) {
--		flags = iwl_mvm_mac80211_idx_to_hwrate(fw, rate_idx);
--		cck_flag = IWL_MAC_BEACON_CCK;
--	} else {
--		cck_flag = IWL_MAC_BEACON_CCK_V1;
--		flags = iwl_fw_rate_idx_to_plcp(rate_idx);
--	}
- 
- 	if (rate_idx <= IWL_LAST_CCK_RATE)
--		flags |= cck_flag;
-+		flags |= is_new_rate ? IWL_MAC_BEACON_CCK
-+			  : IWL_MAC_BEACON_CCK_V1;
- 
- 	return flags;
- }
-diff --git a/drivers/net/wireless/intel/iwlwifi/mvm/utils.c b/drivers/net/wireless/intel/iwlwifi/mvm/utils.c
-index 62da0132f3838a5e870c9ba27546304efe44e554..a62f5288dfd0642be53e935b07e369d530cce6ca 100644
---- a/drivers/net/wireless/intel/iwlwifi/mvm/utils.c
-+++ b/drivers/net/wireless/intel/iwlwifi/mvm/utils.c
-@@ -169,9 +169,15 @@ int iwl_mvm_legacy_rate_to_mac80211_idx(u32 rate_n_flags,
- 
- u8 iwl_mvm_mac80211_idx_to_hwrate(const struct iwl_fw *fw, int rate_idx)
- {
--	return (rate_idx >= IWL_FIRST_OFDM_RATE ?
--		rate_idx - IWL_FIRST_OFDM_RATE :
--		rate_idx);
-+	if (iwl_fw_lookup_cmd_ver(fw, TX_CMD, 0) > 8)
-+		/* In the new rate legacy rates are indexed:
-+		 * 0 - 3 for CCK and 0 - 7 for OFDM.
-+		 */
-+		return (rate_idx >= IWL_FIRST_OFDM_RATE ?
-+			rate_idx - IWL_FIRST_OFDM_RATE :
-+			rate_idx);
-+
-+	return iwl_fw_rate_idx_to_plcp(rate_idx);
- }
- 
- u8 iwl_mvm_mac80211_ac_to_ucode_ac(enum ieee80211_ac_numbers ac)
 diff --git a/drivers/pci/controller/Makefile b/drivers/pci/controller/Makefile
 index 038ccbd9e3ba238c98c380a31aa5e1d34ec5fceb..de5e4f5145af8d7d31aac64035981923da450f2e 100644
 --- a/drivers/pci/controller/Makefile
@@ -3833,10 +3781,10 @@ index 8ae86371ddcddf836172ee93ca34f2e91b4057a7..a972ef1e31a7e0ed1a388a0a7555cfdd
  obj-y += build_utility.o
 diff --git a/kernel/sched/alt_core.c b/kernel/sched/alt_core.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..6a8c29288d8110c378491cb342e52afd1a8ec34a
+index 0000000000000000000000000000000000000000..000b418ad4253410356725eb3c047d1e94235c9a
 --- /dev/null
 +++ b/kernel/sched/alt_core.c
-@@ -0,0 +1,7649 @@
+@@ -0,0 +1,7640 @@
 +/*
 + *  kernel/sched/alt_core.c
 + *
@@ -3967,12 +3915,9 @@ index 0000000000000000000000000000000000000000..6a8c29288d8110c378491cb342e52afd
 +# define finish_arch_post_lock_switch()	do { } while (0)
 +#endif
 +
-+static cpumask_t sched_preempt_mask[SCHED_QUEUE_BITS + 2] ____cacheline_aligned_in_smp;
++static cpumask_t sched_preempt_mask[SCHED_QUEUE_BITS] ____cacheline_aligned_in_smp;
 +
-+cpumask_t *const sched_idle_mask = &sched_preempt_mask[SCHED_QUEUE_BITS - 1];
-+cpumask_t *const sched_sg_idle_mask = &sched_preempt_mask[SCHED_QUEUE_BITS];
-+cpumask_t *const sched_pcore_idle_mask = &sched_preempt_mask[SCHED_QUEUE_BITS];
-+cpumask_t *const sched_ecore_idle_mask = &sched_preempt_mask[SCHED_QUEUE_BITS + 1];
++cpumask_t sched_idle_mask[3] ____cacheline_aligned_in_smp;
 +
 +/* task function */
 +static inline const struct cpumask *task_user_cpus(struct task_struct *p)
@@ -4004,14 +3949,6 @@ index 0000000000000000000000000000000000000000..6a8c29288d8110c378491cb342e52afd
 +	idle->on_rq = TASK_ON_RQ_QUEUED;
 +}
 +
-+#define CLEAR_CACHED_PREEMPT_MASK(pr, low, high, cpu)		\
-+	if (low < pr && pr <= high)				\
-+		cpumask_clear_cpu(cpu, sched_preempt_mask + pr);
-+
-+#define SET_CACHED_PREEMPT_MASK(pr, low, high, cpu)		\
-+	if (low < pr && pr <= high)				\
-+		cpumask_set_cpu(cpu, sched_preempt_mask + pr);
-+
 +static atomic_t sched_prio_record = ATOMIC_INIT(0);
 +
 +/* water mark related functions */
@@ -4019,7 +3956,6 @@ index 0000000000000000000000000000000000000000..6a8c29288d8110c378491cb342e52afd
 +{
 +	int prio = find_first_bit(rq->queue.bitmap, SCHED_QUEUE_BITS);
 +	int last_prio = rq->prio;
-+	int cpu, pr;
 +
 +	if (prio == last_prio)
 +		return;
@@ -4028,24 +3964,26 @@ index 0000000000000000000000000000000000000000..6a8c29288d8110c378491cb342e52afd
 +#ifdef CONFIG_SCHED_PDS
 +	rq->prio_idx = sched_prio2idx(rq->prio, rq);
 +#endif
-+	cpu = cpu_of(rq);
-+	pr = atomic_read(&sched_prio_record);
 +
-+	if (prio < last_prio) {
-+		if (IDLE_TASK_SCHED_PRIO == last_prio) {
++	int cpu = cpu_of(rq);
++	bool set = prio > last_prio;
++	int low = set ? last_prio : prio;
++	int high = set ? prio : last_prio;
++
++	if (IDLE_TASK_SCHED_PRIO == high) {
++		high -= 2;
++		if (set)
++			sched_set_idle_mask(cpu);
++		else
 +			sched_clear_idle_mask(cpu);
-+			last_prio -= 2;
-+		}
-+		CLEAR_CACHED_PREEMPT_MASK(pr, prio, last_prio, cpu);
-+
-+		return;
 +	}
-+	/* last_prio < prio */
-+	if (IDLE_TASK_SCHED_PRIO == prio) {
-+		sched_set_idle_mask(cpu);
-+		prio -= 2;
++	int pr = atomic_read(&sched_prio_record);
++	if (low < pr && pr <= high) {
++		if (set)
++			cpumask_set_cpu(cpu, sched_preempt_mask + pr);
++		else
++			cpumask_clear_cpu(cpu, sched_preempt_mask + pr);
 +	}
-+	SET_CACHED_PREEMPT_MASK(pr, last_prio, prio, cpu);
 +}
 +
 +/* need a wrapper since we may need to trace from modules */
@@ -5864,7 +5802,8 @@ index 0000000000000000000000000000000000000000..6a8c29288d8110c378491cb342e52afd
 +	if (unlikely(!cpumask_and(&allow_mask, p->cpus_ptr, cpu_active_mask)))
 +		return select_fallback_rq(task_cpu(p), p);
 +
-+	if (static_call(sched_idle_select_func)(&mask, &allow_mask, sched_idle_mask)	||
++	if ((cpumask_intersects(&mask, sched_idle_mask) &&
++	     static_call(sched_idle_select_func)(&mask, &allow_mask, sched_idle_mask)) ||
 +	    preempt_mask_check(&mask, &allow_mask, task_sched_prio(p)))
 +		return best_mask_cpu(task_cpu(p), &mask);
 +
@@ -11488,10 +11427,10 @@ index 0000000000000000000000000000000000000000..6a8c29288d8110c378491cb342e52afd
 +#endif /* CONFIG_SCHED_MM_CID */
 diff --git a/kernel/sched/alt_core.h b/kernel/sched/alt_core.h
 new file mode 100644
-index 0000000000000000000000000000000000000000..55497941a22b07f8eeeccf841043d41abf932246
+index 0000000000000000000000000000000000000000..34c65fc1aee4889517dd4c3f27cc62bc0995e404
 --- /dev/null
 +++ b/kernel/sched/alt_core.h
-@@ -0,0 +1,174 @@
+@@ -0,0 +1,175 @@
 +#ifndef _KERNEL_SCHED_ALT_CORE_H
 +#define _KERNEL_SCHED_ALT_CORE_H
 +
@@ -11645,17 +11584,18 @@ index 0000000000000000000000000000000000000000..55497941a22b07f8eeeccf841043d41a
 +
 +extern int sched_yield_type;
 +
-+extern cpumask_t sched_rq_pending_mask ____cacheline_aligned_in_smp;
++extern cpumask_t sched_rq_pending_mask;
 +
 +DECLARE_STATIC_KEY_FALSE(sched_smt_present);
 +DECLARE_PER_CPU_ALIGNED(cpumask_t *, sched_cpu_llc_mask);
 +
-+extern cpumask_t sched_smt_mask ____cacheline_aligned_in_smp;
++extern cpumask_t sched_smt_mask;
 +
-+extern cpumask_t *const sched_idle_mask;
-+extern cpumask_t *const sched_sg_idle_mask;
-+extern cpumask_t *const sched_pcore_idle_mask;
-+extern cpumask_t *const sched_ecore_idle_mask;
++extern cpumask_t sched_idle_mask[3];
++
++#define sched_sg_idle_mask	(sched_idle_mask + 1)
++#define sched_pcore_idle_mask	(sched_idle_mask + 1)
++#define sched_ecore_idle_mask	(sched_idle_mask + 2)
 +
 +extern struct rq *move_queued_task(struct rq *rq, struct task_struct *p, int new_cpu);
 +
@@ -12725,7 +12665,7 @@ index 0000000000000000000000000000000000000000..6cd5cfe3a332d6b94ad856bc134e6d1b
 +#endif /* _KERNEL_SCHED_ALT_SCHED_H */
 diff --git a/kernel/sched/alt_topology.c b/kernel/sched/alt_topology.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..590ee3cb1b496c7b1243282ecf394476ce24eada
+index 0000000000000000000000000000000000000000..cf5921e8268bd63903aceeb35120f96913e01d1e
 --- /dev/null
 +++ b/kernel/sched/alt_topology.c
 @@ -0,0 +1,287 @@
@@ -12734,14 +12674,14 @@ index 0000000000000000000000000000000000000000..590ee3cb1b496c7b1243282ecf394476
 +
 +static cpumask_t sched_pcore_mask ____cacheline_aligned_in_smp;
 +
-+static int __init sched_pcore_mask_setup(char *str)
++static int __init pcore_cpus_setup(char *str)
 +{
 +	if (cpulist_parse(str, &sched_pcore_mask))
 +		pr_warn("sched/alt: pcore_cpus= incorrect CPU range\n");
 +
-+	return 0;
++	return 1;
 +}
-+__setup("pcore_cpus=", sched_pcore_mask_setup);
++__setup("pcore_cpus=", pcore_cpus_setup);
 +
 +DEFINE_PER_CPU_READ_MOSTLY(enum cpu_topo_type, sched_cpu_topo);
 +DEFINE_PER_CPU_READ_MOSTLY(enum cpu_topo_balance_type, sched_cpu_topo_balance);
@@ -14899,7 +14839,7 @@ index e443fe8cd6cf256ca20b8a58b95d18b6f5448f47..509dab412dbbac7d312950f8de85bf89
  
  #
 diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-index 24cb81c8d8384ef1707460c4adc24074aeaf9630..4d3405ba035ba4c1b2701db3d1c89c2a5a3c49e8 100644
+index c5e1ee5668412330b6035760c9a181625e2fa348..d7e7ff7720f088bce703e4b49b6ebf043fa278b6 100644
 --- a/mm/huge_memory.c
 +++ b/mm/huge_memory.c
 @@ -63,7 +63,11 @@ unsigned long transparent_hugepage_flags __read_mostly =
