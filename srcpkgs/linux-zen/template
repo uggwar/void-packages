@@ -1,6 +1,6 @@
 # Template file for 'linux-zen'
 pkgname=linux-zen
-version=6.17.9
+version=6.18.0
 revision=1
 short_desc="Linux kernel and modules (${version%.*} series)"
 maintainer="Duncaen <duncaen@voidlinux.org>"
