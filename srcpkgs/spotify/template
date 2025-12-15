@@ -1,8 +1,8 @@
 # Template file for 'spotify'
 pkgname=spotify
-version=1.2.74
+version=1.2.77
 revision=1
-_subver=477.g3be53afe
+_subver=358.g4339a634
 archs="x86_64"
 create_wrksrc=yes
 hostmakedepends="libcurl"
@@ -12,7 +12,7 @@ maintainer="Stefan Mühlinghaus <jazzman@alphabreed.com>"
 license="custom:Proprietary"
 homepage="https://www.spotify.com"
 distfiles="http://repository.spotify.com/pool/non-free/s/spotify-client/spotify-client_${version}.${_subver}_amd64.deb"
-checksum=cbb36807c602bb38c53312b9ed790d7cb4039a59a98953494dba0d89a8144399
+checksum=77c29e0912cee7e4cc69ac8f042cbb6a6546794a98391918c3948547fa308320
 repository=nonfree
 restricted=yes
 nostrip=yes
