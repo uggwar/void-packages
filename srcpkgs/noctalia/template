@@ -1,0 +1,53 @@
+# Template file for 'noctalia'
+pkgname=noctalia
+version=5.5.0
+revision=1
+build_style=meson
+configure_args="-Dtests=disabled"
+# Optional at runtime (no Void optdepends mechanism): upower, ddcutil,
+# power-profiles-daemon, libheif (dlopen'd), and a Secret Service provider.
+short_desc="A sleek, customizable desktop shell crafted for Wayland"
+# TODO: replace with your own valid email before submitting upstream
+maintainer="Christer Stenbrenden <christer.stenbrenden@users.noreply.github.com>"
+license="MIT"
+homepage="https://github.com/noctalia-dev/noctalia"
+changelog="https://github.com/noctalia-dev/noctalia/releases"
+distfiles="https://github.com/noctalia-dev/noctalia/archive/refs/tags/v${version}.tar.gz"
+checksum=f3fe8a1f1d4306280413e04f934400b787dba212d296d97dfd638bcb55c78262
+archs="x86_64* aarch64*"
+hostmakedepends="pkg-config"
+makedepends="wayland-devel wayland-protocols libepoxy-devel MesaLib-devel
+ libglvnd-devel cairo-devel pango-devel fontconfig-devel freetype-devel
+ harfbuzz-devel libxkbcommon-devel libglib-devel pipewire-devel
+ wireplumber-devel libsecret-devel libsodium-devel libcurl-devel pam-devel
+ libwebp-devel libjxl-devel libsndfile-devel basu-devel sdbus-c++-devel
+ libmd4c-devel tomlplusplus-devel libical-devel json-c++ stb polkit-devel
+ librsvg-devel libqalculate-devel libxml2-devel"
+depends="git hicolor-icon-theme sound-theme-freedesktop"
+
+# jemalloc is glibc-only: upstream recommends it on glibc and skipping it on musl
+case "${XBPS_TARGET_LIBC}" in
+	musl) configure_args+=" -Djemalloc=disabled" ;;
+	*)
+		configure_args+=" -Djemalloc=enabled"
+		makedepends+=" jemalloc-devel"
+		;;
+esac
+
+post_install() {
+	# Completions are generated from the freshly built binary (PACKAGING.md);
+	# they are static files upstream does not ship. Skip when cross-compiling
+	# because the target binary cannot run on the host.
+	if [ -z "${CROSS_BUILD}" ]; then
+		local noctalia_bin="${DESTDIR}/usr/bin/noctalia"
+		vmkdir usr/share/bash-completion/completions
+		vmkdir usr/share/zsh/site-functions
+		vmkdir usr/share/fish/vendor_completions.d
+		"${noctalia_bin}" completions bash \
+			>"${DESTDIR}/usr/share/bash-completion/completions/noctalia"
+		"${noctalia_bin}" completions zsh \
+			>"${DESTDIR}/usr/share/zsh/site-functions/_noctalia"
+		"${noctalia_bin}" completions fish \
+			>"${DESTDIR}/usr/share/fish/vendor_completions.d/noctalia.fish"
+	fi
+}
